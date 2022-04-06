@@ -202,10 +202,24 @@ steps:
 
   - script: |
       set -e
+      ps -ef
+    displayName: Print Processes
+    continueOnError: true
+    condition: succeededOrFailed()
+
+  - script: |
+      set -e
       ./scripts/test.sh --build --tfs "Unit Tests"
     displayName: Run unit tests (Electron)
     timeoutInMinutes: 15
     condition: and(succeeded(), eq(variables['VSCODE_ARCH'], 'x64'), eq(variables['VSCODE_STEP_ON_IT'], 'false'))
+
+  - script: |
+      set -e
+      ps -ef
+    displayName: Print Processes
+    continueOnError: true
+    condition: succeededOrFailed()
 
   - script: |
       set -e
@@ -216,10 +230,24 @@ steps:
 
   - script: |
       set -e
+      ps -ef
+    displayName: Print Processes
+    continueOnError: true
+    condition: succeededOrFailed()
+
+  - script: |
+      set -e
       DEBUG=*browser* yarn test-browser-no-install --build --browser chromium --tfs "Browser Unit Tests"
     displayName: Run unit tests (Browser, Chromium)
     timeoutInMinutes: 15
     condition: and(succeeded(), eq(variables['VSCODE_ARCH'], 'x64'), eq(variables['VSCODE_STEP_ON_IT'], 'false'))
+
+  - script: |
+      set -e
+      ps -ef
+    displayName: Print Processes
+    continueOnError: true
+    condition: succeededOrFailed()
 
   - script: |
       # Figure out the full absolute path of the product we just built
@@ -238,11 +266,25 @@ steps:
 
   - script: |
       set -e
+      ps -ef
+    displayName: Print Processes
+    continueOnError: true
+    condition: succeededOrFailed()
+
+  - script: |
+      set -e
       VSCODE_REMOTE_SERVER_PATH="$(agent.builddirectory)/vscode-reh-web-linux-$(VSCODE_ARCH)" \
       ./scripts/test-web-integration.sh --browser chromium
     displayName: Run integration tests (Browser, Chromium)
     timeoutInMinutes: 20
     condition: and(succeeded(), eq(variables['VSCODE_ARCH'], 'x64'), eq(variables['VSCODE_STEP_ON_IT'], 'false'))
+
+  - script: |
+      set -e
+      ps -ef
+    displayName: Print Processes
+    continueOnError: true
+    condition: succeededOrFailed()
 
   - script: |
       set -e
@@ -259,9 +301,7 @@ steps:
   - script: |
       set -e
       ps -ef
-      cat /proc/sys/fs/inotify/max_user_watches
-      lsof | wc -l
-    displayName: Diagnostics before smoke test run (processes, max_user_watches, number of opened file handles)
+    displayName: Print Processes
     continueOnError: true
     condition: succeededOrFailed()
 
@@ -275,12 +315,26 @@ steps:
 
   - script: |
       set -e
+      ps -ef
+    displayName: Print Processes
+    continueOnError: true
+    condition: succeededOrFailed()
+
+  - script: |
+      set -e
       APP_PATH=$(agent.builddirectory)/VSCode-linux-$(VSCODE_ARCH)
       yarn smoketest-no-compile --verbose --tracing --build "$APP_PATH"
     # TODO@bpasero reduce timeout and remove --verbose when done
     timeoutInMinutes: 60
     displayName: Run smoke tests (Electron)
     condition: and(succeeded(), eq(variables['VSCODE_ARCH'], 'x64'), eq(variables['VSCODE_STEP_ON_IT'], 'false'))
+
+  - script: |
+      set -e
+      ps -ef
+    displayName: Print Processes
+    continueOnError: true
+    condition: succeededOrFailed()
 
   - script: |
       set -e
@@ -295,9 +349,7 @@ steps:
   - script: |
       set -e
       ps -ef
-      cat /proc/sys/fs/inotify/max_user_watches
-      lsof | wc -l
-    displayName: Diagnostics after smoke test run (processes, max_user_watches, number of opened file handles)
+    displayName: Print Processes
     continueOnError: true
     condition: succeededOrFailed()
 
@@ -424,3 +476,10 @@ steps:
     displayName: Publish SBOM (server)
     artifact: vscode_server_linux_$(VSCODE_ARCH)_sbom
     condition: and(succeeded(), ne(variables['VSCODE_PUBLISH'], 'false'))
+
+  - script: |
+      set -e
+      ps -ef
+    displayName: Print Processes
+    continueOnError: true
+    condition: succeededOrFailed()
